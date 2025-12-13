@@ -9,18 +9,14 @@
 - 能把链接自动转换为参考文献索引，并且附在文字末尾
 
 ## 预览地址
-https://markdowncool.tickmao.com/
+https://mdwx.tickmao.com/
 
 ## 缩略图
-![](https://ae01.alicdn.com/kf/H9689f7fb0b8f4f55875cb2a7833dd7d8L.png)
+![bc8c61655a2d61ca5881ff5f597e4060.png](https://i.mji.rip/2025/12/13/bc8c61655a2d61ca5881ff5f597e4060.png)
 
 ## 声明
 
 仅用于学习个人使用，如有侵权请联系删除。E-mail：[lyle.lypm@gmail.com](mailto:lyle.lypm@gmail.com)
-
-## 致谢
-
-本作品是基于原作者[lyricat](https://github.com/lyricat/wechat-format)，在此表示感谢。
 
 ## 参与我们
 
@@ -30,4 +26,4 @@ https://markdowncool.tickmao.com/
 
 MarkdownCool ©[Tickmao](https://www.tickmao.com), Released under the MIT License.
 
-Blog @[Tickmao](https://blog.tickmao.com) · GitHub @[Tickmao](https://github.com/tickmao) · Twitter @[Tickmao](https://twitter.com/Tick_puppet)
+Blog @[Tickmao](https://tickmao.com) · GitHub @[Tickmao](https://github.com/tickmao) · Twitter @[Tickmao](https://twitter.com/tickmao)
