@@ -1,0 +1,15 @@
+{
+  "name": "markdown-cool",
+  "version": "1.0.0",
+  "description": "A premium WeChat Markdown editor.",
+  "scripts": {
+    "start": "npx live-server . --port=8080 --host=localhost --entry-file=index.html"
+  },
+  "keywords": [
+    "markdown",
+    "wechat",
+    "editor"
+  ],
+  "author": "Tick",
+  "license": "ISC"
+}

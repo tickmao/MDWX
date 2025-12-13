@@ -1,21 +1,20 @@
-var defaultTheme = {
+var focusOrangeTheme = {
     BASE: {
         'text-align': 'justify',
-        'color': '#2c3e50', // Vue Dark Blue/Grey
-        'line-height': '1.7',
-        'letter-spacing': '0.02em',
-        'font-family': "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif"
+        'color': '#2c2c2c',
+        'line-height': '1.75',
+        'letter-spacing': '0.01em'
     },
     BASE_BLOCK: {
-        'margin': '22px 16px'
+        'margin': '24px 16px'
     },
     block: {
         h1: {
-            'font-size': '20px',
+            'font-size': '22px',
             'font-weight': '700',
             'margin': '48px 0 24px 0',
             'line-height': '1.4',
-            'color': '#2c3e50', // Vue Dark
+            'color': '#333',
             'text-align': 'left'
         },
         h2: {
@@ -23,40 +22,44 @@ var defaultTheme = {
             'font-weight': '700',
             'margin': '40px 0 20px 0',
             'line-height': '1.4',
-            'color': '#42b883', // Vue Green Title
+            'color': '#ff6600', // Bright Orange
             'text-align': 'left',
-            'border-bottom': '1px solid #eaecef', // Subtle separator
-            'padding-bottom': '10px'
+            'border-bottom': '2px solid #ff6600',
+            'padding-bottom': '10px',
+            'background': 'none',
+            'border-radius': '0',
+            'padding': '0'
         },
         h3: {
             'font-weight': '700',
             'font-size': '16px',
             'margin': '32px 0 16px 0',
             'line-height': '1.4',
-            'color': '#42b883' // Vue Green
+            'color': '#ff6600' // Unified
         },
         h4: {
             'font-weight': '700',
             'font-size': '15px',
             'margin': '24px 0 12px 0',
-            'color': '#42b883' // Vue Green Subheader
+            'color': '#ff6600' // Unified
         },
         p: {
-            'margin': '1.5em 0',
+            'margin': '1.6em 0',
             'text-align': 'justify'
         },
         blockquote: {
-            'color': '#6a737d',
-            'padding': '14px 18px',
-            'border-left': '4px solid #42b883', // Vue Green Anchor
+            'color': '#595959',
+            'padding': '16px 20px',
+            'border-left': '4px solid #ff6600', // Unified
+            'background': '#fff9f2',
             'margin': '24px 0',
-            'line-height': '1.6',
-            'background': '#f8f9fa' // Very light grey
+            'line-height': '1.7',
+            'border-radius': '0 4px 4px 0'
         },
         code: {
             'font-size': '13px',
-            'color': '#42b883', // Vue Green Text
-            'background': '#f8f9fa',
+            'color': '#ff6600', // Unified
+            'background': '#fff5eb',
             'border-radius': '4px',
             'padding': '4px 6px',
             'margin': '0 2px',
@@ -66,65 +69,67 @@ var defaultTheme = {
             'display': 'block',
             'margin': '32px auto',
             'width': '100%',
-            'border-radius': '4px'
+            'border-radius': '4px',
+            'border': '1px solid #ffebb5'
         },
         ol: {
-            'margin': '22px 0',
-            'padding-left': '24px'
+            'margin': '20px 0',
+            'padding-left': '20px'
         },
         ul: {
-            'margin': '22px 0',
-            'padding-left': '24px',
+            'margin': '20px 0',
+            'padding-left': '20px',
             'list-style': 'disc'
         }
     },
     inline: {
         listitem: {
             'display': 'list-item',
-            'margin': '6px 0',
-            'line-height': '1.7'
+            'margin': '8px 0',
+            'line-height': '1.75'
         },
         codespan: {
             'font-size': '0.9em',
-            'color': '#42b883',
-            'background': 'rgba(66, 184, 131, 0.08)',
-            'padding': '3px 6px',
+            'color': '#ff6600', // Unified
+            'background': '#ffe0b2',
+            'padding': '2px 6px',
             'margin': '0 2px',
             'border-radius': '4px'
         },
         link: {
-            'color': '#42b883', // Vue Green Link
+            'color': '#ff6600', // Unified
             'text-decoration': 'none',
-            'font-weight': '500',
-            'border-bottom': '1px dashed #42b883'
+            'border-bottom': '1px dashed #ff6600' // Unified
         },
         strong: {
             'font-weight': '700',
-            'color': '#2c3e50'
+            'color': '#ff6600' // Unified
         },
         em: {
             'font-style': 'italic',
-            'color': '#2c3e50'
+            'color': '#666'
         },
         table: {
             'border-collapse': 'collapse',
             'margin': '24px auto',
-            'width': '100%'
+            'width': '100%',
+            'border': '1px solid #ffcc99',
+            'background': '#fffaf5'
         },
         thead: {
-            'background': '#f8f9fa',
-            'border-bottom': '2px solid #42b883' // Vue Green Header Line
+            'background': '#ffe0b2',
+            'border-bottom': '2px solid #ff6600' // Unified
         },
         th: {
-            'padding': '12px 14px',
-            'color': '#2c3e50',
+            'padding': '10px',
             'font-weight': '700',
+            'color': '#ff6600', // Unified
             'text-align': 'center'
         },
         td: {
-            'border-bottom': '1px solid #dfe2e5',
-            'padding': '12px 14px',
-            'color': '#34495e',
+            'border-bottom': '1px solid #ffcc99',
+            'padding': '10px',
+            'color': '#555',
             'line-height': '1.5'
         }
     }

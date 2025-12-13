@@ -1,115 +1,146 @@
 var tickmaoTheme = {
     BASE: {
-        'text-align': 'left',
-        'color': '#777',
-        'line-height': '1.35em',
-        'letter-spacing': '0.04em'
+        'text-align': 'justify',
+        'color': '#3f3f3f', // Shimo-like Dark Grey (Not harsh black)
+        'line-height': '1.8', // Loose line-height for elegance
+        'font-size': '14px', // The "Exquisite" Base
+        'letter-spacing': '0.02em'
     },
     BASE_BLOCK: {
-        'margin': '20px 10px'
-      },
+        'margin': '24px 16px'
+    },
     block: {
+        h1: {
+            'font-size': '20px', // Restrained
+            'font-weight': '700',
+            'margin': '48px 0 24px 0',
+            'line-height': '1.4',
+            'color': '#111111',
+            'text-align': 'center'
+        },
         h2: {
-            'font-size': '140%',
+            'font-size': '18px', // Restrained
+            'font-weight': '700',
+            'margin': '48px 0 20px 0',
+            'line-height': '1.5',
+            'color': '#e05a8d', // Tickmao Pink Title
             'text-align': 'center',
-            'font-weight': 'bold',
-            'text-align': 'center',
-            'margin': '80px 10px 40px 10px'
+            'padding': '0',
+            'background': 'transparent',
+            'border': 'none',
+            'border-bottom': 'none'
         },
         h3: {
-            'font-weight': 'bold',
-            'font-size': '120%',
-            'margin': '40px 10px 20px 10px'
+            'font-weight': '700',
+            'font-size': '16px',
+            'margin': '32px 0 12px 0',
+            'line-height': '1.5',
+            'color': '#e05a8d', // Tickmao Pink H3
+            'text-align': 'left',
+            'padding-left': '0',
+            'border-left': 'none'
+        },
+        h4: {
+            'font-weight': '700',
+            'font-size': '15px',
+            'margin': '24px 0 12px 0',
+            'color': '#e05a8d' // Pink Subhead
         },
         p: {
-            'margin': '10px 10px',
-            'line-height': '1.5'
+            'margin': '20px 0',
+            'text-align': 'justify'
         },
         blockquote: {
-            'color': '#616161',
-            'padding-left': '10px',
-            // 'padding-top': '0.05px',
-            'background-color': '#FBF9FD',
-            'line-height': '1.5',
-            'border-left': '3px solid #35b378',
-            'font-size': '15px',
-            'margin': '1em 10px'
+            'color': '#757575',
+            'padding': '0 20px',
+            'border-left': '3px solid #e05a8d', // Pink Line
+            'background': 'transparent',
+            'margin': '24px 0',
+            'line-height': '1.7',
+            'font-style': 'italic'
         },
         code: {
-            'font-size': '80%',
-            'overflow': 'auto',
-            'color': 'rgb(71, 193, 168)',
-            'background': 'rgb(247, 247, 247)',
-            'border-radius': '2px',
-            'padding': '10px',
-            'line-height': '1.2',
-            'border': '1px solid rgb(236,236,236)',
-            'margin': '20px 0',
+            'font-size': '13px',
+            'color': '#e05a8d', // Vivid Pink
+            'background': '#f9f9f9',
+            'border-radius': '4px',
+            'padding': '4px 6px',
+            'margin': '0 2px',
+            'font-family': "Menlo, Monaco, 'Courier New', monospace",
         },
         image: {
-            'border-radius': '4px',
             'display': 'block',
-            'margin': '20px auto',
+            'margin': '32px auto',
             'width': '100%',
-        },
-        image_org: {
             'border-radius': '4px',
-            'display': 'block',
+            'box-shadow': '0 4px 20px rgba(0,0,0,0.06)'
         },
         ol: {
-            'margin-left': '0',
+            'margin': '20px 0',
             'padding-left': '20px'
         },
         ul: {
-            'margin-left': '0',
+            'margin': '20px 0',
             'padding-left': '20px',
-            'list-style': 'circle',
-        },
-        footnotes: {
-            'margin': '10px 10px',
-            'font-size': '14px'
+            'list-style': 'disc'
         }
     },
     inline: {
-        // inline element
         listitem: {
-            'text-indent': '-20px',
-            'display': 'block',
-            'margin': '10px 10px',
+            'display': 'list-item',
+            'margin': '8px 0',
+            'line-height': '1.8',
+            'color': '#333'
         },
         codespan: {
-            'font-size': '0.8em',
-            'color': '#35b378',
-            'background': '#fefefe',
-            'padding': '3px 5px 0px',
-            'margin': '0px 2px',
-            'border': '1px solid #ddd',
-            'border-radius': '3px',
+            'font-size': '0.9em',
+            'color': '#e05a8d',
+            'background': 'rgba(224, 90, 141, 0.06)', // Transparent Pink
+            'padding': '2px 6px',
+            'margin': '0 2px',
+            'border-radius': '4px'
         },
         link: {
-            'color': '#35b378'
-        },
-        wx_link: {
-            'color': '#35b378',
-            'text-decoration': 'none'
+            'color': '#e05a8d', // Pink Link
+            'text-decoration': 'none',
+            'border-bottom': '1px dashed #e05a8d', // Pink Dashed Line
+            'font-weight': '400'
         },
         strong: {
-            'font-weight': 'bold',
+            'font-weight': '700',
+            'color': '#e05a8d' // Pink Emphasis
+        },
+        em: {
+            'font-style': 'italic',
+            'color': '#666'
         },
         table: {
             'border-collapse': 'collapse',
-            'margin': '20px auto',
+            'margin': '32px auto',
+            'width': '100%',
+            'table-layout': 'auto',
+            'font-size': '12px',
+            'border': 'none',
+            'border-top': '2px solid #e05a8d', // Pink Top
+            'border-bottom': '2px solid #e05a8d' // Pink Bottom
         },
         thead: {
-            'background': 'rgba(0,0,0,0.05)',
+            'display': 'table-header-group'
+        },
+        th: {
+            'background-color': '#fff',
+            'border-bottom': '1px solid #e05a8d', // Pink Divider
+            'padding': '8px 4px',
+            'font-weight': '700',
+            'color': '#333',
+            'text-align': 'center'
         },
         td: {
-            'font-size': '80%',
-            'border': '1px solid #dfdfdf',
-            'padding': '4px 8px',
-        },
-        footnote: {
-            'font-size': '12px',
+            'border-bottom': '1px solid #eee',
+            'padding': '8px 4px',
+            'color': '#333',
+            'line-height': '1.5',
+            'min-width': '50px'
         }
     }
-}
+};

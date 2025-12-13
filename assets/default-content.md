@@ -1,132 +1,145 @@
-使用时，你得把默认的 Markdown 内容换成你自己的内容。
+# MDWX 排版全能指南
 
-关于 Markdown 得基础预防请看[这篇公众号文章](https://mp.weixin.qq.com/s/ZUo6Syzg2miOLOuNE13e8g)。
+欢迎使用 **MDWX**，这是一款专为微信公众号打造的沉浸式 Markdown 编辑器。本文档将展示所有支持的排版样式，助您创作出完美的公众号文章。
 
+## 1. 基础排版 (Typography)
 
-## 一级标题
+我们精心调校了中英文混排的间距与行高，确保阅读体验舒适。
 
-这是一级标题
+- **粗体强调**：使用 `**` 包裹，例如 **重点内容**。
+- *斜体样式*：虽然微信对斜体支持有限，但我们依然为你保留（建议尽量少用）。
+- ~~删除线~~：用于表示已过时或修正的内容。
+- `行内代码`：用于高亮关键术语，如 `Variables` 或 `Function`。
+- [链接样式](https://mp.weixin.qq.com)：外部链接在公众号中会自动转换为文末的**参考文献**脚注，而公众号文章链接则可以直接点击跳转。
 
+---
 
-### 二级标题
+## 2. 列表与嵌套 (Lists)
 
-上面是二级标题
+MDWX 完美支持多层级列表嵌套，逻辑清晰，层次分明。
 
-## 文字样式
+### 无序列表
+- 一级列表项：核心观点
+  - 二级列表项：补充说明
+  - 二级列表项：细节描述
+    - 三级列表项：深入挖掘
 
-### 基本样式
+### 有序列表
+1. **准备阶段**：整理素材与大纲。
+2. **撰写阶段**：
+   1. 使用 Markdown 专注内容创作。
+   2. 随时预览实际渲染效果。
+3. **发布阶段**：点击右上角复制，粘贴至公众号后台。
 
-你好，我是一个来自地球的人。
+---
 
-我是一个[智人](https://zh.wikipedia.org/wiki/智人 "学名：Homo sapiens，意为“有智慧的人”")，
-我喜欢穿新衣服，都是**黑衣服**。
+## 3. 引用样式 (Blockquotes)
 
-我最大的*爱好*是拆汽车，我拆了很多汽车，宝马、奔驰、劳斯莱斯和特斯拉，但是都没装回去。
+引用块非常适合用于摘录名言、强调警句或作为文章的导语。
 
-上面表现了链接和加重两种样式，公众号以外的链接会被转换为脚注。
+> **“设计不仅仅是外观，更是运作方式。”**
+> 
+> —— Steve Jobs
 
+多级引用演示：
+> 一级引用：这是外层
+> > 二级引用：这是内层嵌套，用于对话或深层引用。
 
-### 注音符号
+---
 
-[注音符号 W3C 定义](http://www.w3.org/TR/ruby/)。支持日语注音假名，小夜時雨【さ・よ・しぐれ】 和 汉语拼音 上海【Shàng・hǎi】
+## 4. 代码高亮 (Code Highlighting)
 
-用法有以下几种：
+这是 MDWX 的强项。我们采用了**微信官方风格**的深色代码块，支持 100+ 种语言高亮，并优化了 Padding 与圆角，手机端阅读体验极佳。
 
-```
-世界【せかい】
-世界{せかい}
-```
+**JavaScript / TypeScript**
+```javascript
+// 现代 JS 语法高亮演示
+const greeting = (name) => {
+  const date = new Date();
+  return `Hello ${name}, it's ${date.getHours()} o'clock.`;
+};
 
-世界{せかい}
-
-```
-小夜時雨【さ・よ・しぐれ】
-```
-
-小夜時雨【さ・よ・しぐれ】
-
-```
-食べる【たべる】
-食べる{たべる}
-```
-
-食べる{たべる}\n\n english【英文】 will not translated{fan yi}'
-
-
-## 段落、列表、引用
-
-[Markdown](https://sspai.com/post/25137 "认识与入门 Markdown") 是一种写文章用的语法。
-
-我们日常写文章用的工具，比如说 Word，提供了大量排版格式样式相关的选项。
-
-在写作之外，大量的时间都在处理这些排版、格式、样式、字体、图片位置等等。这不但是耗时耗力的事情，而且还会打乱里写作时的思绪，影响你的工作。
-
-无序列表项：
-
-- 一个列表项
-- 另一个列表项
-- 第三个列表项
-
-有序列表项：
-
-1. 一个列表项
-2. 另一个列表项
-3. 第三个列表项
-
-使用 Markdown 最大的意义在于可以让你关注写作本身，不需要花费精力在别的事情上。无论是严肃写作还是随手记，Markdown 都是最佳形式。
-
-> 引用：使用 Markdown 最大的意义在于可以让你关注写作本身
-
-好。
-
-## 代码块、表格、图片
-
-接下来是一张图片。你可以用自己图床，也可以上传到微信媒体库再把图片 URL 粘贴回来，或者编辑好以后，在公众号里插入图片。
-
-![](https://res.wx.qq.com/mpres/zh_CN/htmledition/pages/login/loginpage/images/bg_banner4273fb.png)
-
-代码块，使用微信官方的高亮配色，在代码块标示语言即可。粘贴到公众号后，需要用鼠标点一下代码块，完成高亮。
-
-
-    ```cpp
-    你的代码
-    ```
-
-
-
-```cpp
-#include <stdio.h>
-
-const int MAX = 10;
-int cache[MAX] = {0};
-
-int fib(int x) {
-  if (x == 1) return 1;
-  if (x == 0) return 0;
-  if (cache[x] == 0) {
-    int ret = fib(x - 1) + fib(x - 2)+int ret = fib(x - 1) + fib(x - 2);
-    cache[x] = ret;
+// 异步操作
+async function fetchData(url) {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log('Data loaded:', data);
+  } catch (error) {
+    console.error('Error:', error);
   }
-  return cache[x];
-}
-
-int main() {
-    int i;
-    printf("fibonacci series:\n");
-    for (i = 0; i < MAX; ++i) {
-        printf("%d ", fib(i));
-    }
-    return 0;
 }
 ```
 
-然后是一个内联代码： a paragraphg with inline code `{code: 0}`。
+**CSS / Styling**
+```css
+/* 优美的 CSS 样式 */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+```
 
-接下来是表格示例：
+**Python / Data**
+```python
+# Python 数据处理示例
+def fibonacci(n):
+    if n <= 0:
+        return []
+    elif n == 1:
+        return [0]
+    
+    sequence = [0, 1]
+    while len(sequence) < n:
+        next_val = sequence[-1] + sequence[-2]
+        sequence.append(next_val)
+    return sequence
 
-| Header 1 | Header 2 |
-| --- | --- |
-| Key 1 | Value 1 |
-| Key 2 | Value 2 |
-| Key 3 | Value 3 |
+print(f"Fib(10): {fibonacci(10)}")
+```
 
+**Bash / Terminal**
+```bash
+# 终端命令示例
+$ npm install mdwx-cli -g
+$ mdwx init my-project
+$ cd my-project && npm start
+> Server running at http://localhost:8080...
+```
+
+---
+
+## 5. 表格样式 (Tables)
+
+表格自动居中，带有优雅的边框与斑马纹，适合展示参数或对比数据。
+
+| 功能 | 状态 | 说明 | 级别 |
+| :--- | :---: | :--- | ---: |
+| 实时预览 | ✅ | 双向同步 | High |
+| 自动保存 | ✅ | 本地存储 | High |
+| 代码高亮 | ✅ | 多语言 | Med |
+| 外部图床 | ⏳ | 开发中 | Low |
+
+---
+
+## 6. 特殊元素
+
+### 图片排版
+支持图片自适应宽度，如果是高清大图，会自动缩放至屏幕宽度。
+![MDWX 实时预览效果](https://s2.loli.net/2024/09/15/Tr3a218Zlpe4PjL.png)
+
+### 分割线
+用于分隔不同章节，增加呼吸感。
+
+---
+
+## 7. 脚注系统 (Footnotes)
+
+当您在文中引用外部链接时，例如 [MDWX Github](https://github.com/tickmao) 或 [Markdown 指南](https://www.markdownguide.org)，MDWX 会自动将它们提取并生成如下的参考文献列表，符合微信公众号的规范。
+
+愿 MDWX 成为您写作路上的得力助手。
+**Happy Writing!**

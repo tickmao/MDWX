@@ -1,108 +1,261 @@
-var app = new Vue({
+/**
+ * 应用程序主逻辑 (Vue 实例)
+ * 负责管理编辑器状态、UI 交互以及与 WxRenderer 的通信
+ */
+const app = new Vue({
   el: '#app',
   data: function () {
     return {
-      title: 'Markdown Cool',
-      aboutOutput: '',
-      output: '',
-      source: '',
+      title: 'MDWX', // 页面标题
+      aboutOutput: '', // 关于页面的渲染内容
+      output: '', // 渲染后的 HTML 输出
+      source: '', // Markdown 源码
+
+      // 编辑器主题列表
       editorThemes: [
         { label: 'base16-light', value: 'base16-light' },
         { label: 'duotone-light', value: 'duotone-light' },
         { label: 'monokai', value: 'monokai' }
       ],
-      currentEditorTheme: 'base16-light',
-      editor: null,
+      currentEditorTheme: 'base16-light', // 当前编辑器主题
+      editor: null, // CodeMirror 编辑器实例
+
+      // 内置字体选项 (按衬线和无衬线分类)
+      // 内置字体选项 (按衬线和无衬线分类)
       builtinFonts: [
-        { label: '衬线', value: "Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif"},
-        { label: '无衬线', value: "Roboto, Oxygen, Ubuntu, Cantarell, PingFangSC-light, PingFangTC-light, 'Open Sans', 'Helvetica Neue', sans-serif"}
+        { label: '衬线体 (Serif)', value: "'PT Serif', 'Songti SC', 'Source Han Serif CN', 'Noto Serif SC', 'SimSun', serif" },
+        { label: '无衬线体 (Sans-serif)', value: "'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif" }
       ],
-      currentFont: "Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif",
-      currentSize: '15px',
+      currentFont: 'serif',
+
+      // 字体大小选项 (User Customized)
+      currentSize: '15px', // Default to 15px
       sizeOption: [
-        { label: '15px', value: '15px', desc: '偏小' },
-        { label: '16px', value: '16px', desc: '默认' },
-        { label: '17px', value: '17px', desc: '正常' },
-        { label: '18px', value: '18px', desc: '稍大' }
+        { label: '14px', value: '14px', desc: '极小' },
+        { label: '15px', value: '15px', desc: '小号' },
+        { label: '16px', value: '16px', desc: '标准' },
+        { label: '18px', value: '18px', desc: '大号' },
+        { label: '20px', value: '20px', desc: '特大' }
       ],
+
+      // 排版主题选项
       currentTheme: 'tickmao',
       themeOption: [
-        { label: 'tickmao', value: 'tickmao', author: 'Lyle'},
-        { label: 'default', value: 'default', author: 'Lyric'},
-        { label: 'lupeng', value: 'lupeng', author: '鲁鹏'}
+        { label: 'Default', value: 'tickmao', author: 'Lyle' },
+        { label: 'Tickmao', value: 'default', author: 'Lyric' },
+        { label: 'Medium', value: 'medium', author: 'Focus' },
+        { label: 'Instapaper', value: 'instapaper', author: 'Focus' },
+        { label: 'Shimo', value: 'shimo', author: 'Focus' },
+        { label: 'Orange', value: 'orange', author: 'Focus' }
       ],
+      // 主题对象映射
       styleThemes: {
         tickmao: tickmaoTheme,
         default: defaultTheme,
-        lupeng: lupengTheme
+        medium: focusMediumTheme,
+        instapaper: focusInstapaperTheme,
+        shimo: focusShimoTheme,
+        orange: focusOrangeTheme
       },
-      aboutDialogVisible: false
-    }
+
+      aboutDialogVisible: false, // 关于弹窗可见性
+      currentDate: '' // Current formatted date for preview
+    };
   },
-  mounted () {
-    var self = this
+
+  /**
+   * Vue 生命周期：挂载后
+   * 初始化编辑器和渲染器
+   */
+  mounted: function () {
+    var self = this;
+
+    // Set Current Date (WeChat Format: 2024年5月1日 12:00)
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    this.currentDate = `${dateStr} ${timeStr}`;
+
+    // 初始化 CodeMirror 编辑器
     this.editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
-      lineNumbers: false,
-      lineWrapping: true,
-      styleActiveLine: true,
+      lineNumbers: false, // 不显示行号，保持界面简洁
+      lineWrapping: true, // 自动换行
+      styleActiveLine: true, // 高亮当前行
       theme: this.currentEditorTheme,
       mode: 'text/x-markdown',
+      viewportMargin: Infinity, // CRITICAL: Disable virtualization, render all content. Solves "Blank on Scroll".
     });
-    this.editor.on("change", function(cm, change) {
-      self.refresh()
-    })
-    // this.currentFont = this.builtinFonts[0],
+
+    // Strategy Change: Auto-Height
+    // We let CodeMirror grow naturally and let the parent container handle scrolling.
+    // This removes the need for complex height calculations and manual refresh.
+    setTimeout(() => {
+      self.editor.refresh();
+    }, 100);
+
+    // 工具函数：防抖 (提升性能的核心)
+    function debounce(func, wait) {
+      let timeout;
+      return function () {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          func.apply(context, args);
+        }, wait);
+      };
+    }
+
+    // 监听编辑器变化，实时刷新预览 (加入 300ms 防抖)
+    // 之前是每次击键都渲染，现在改为停止输入 300ms 后再渲染，大幅降低 CPU 占用
+    this.editor.on("change", debounce(function (cm, change) {
+      self.refresh();
+    }, 300));
+
+    // 初始化微信渲染器
     this.wxRenderer = new WxRenderer({
       theme: this.styleThemes.tickmao,
       fonts: this.currentFont,
       size: this.currentSize
-    })
+    });
+
+    // 加载默认示例文档
     axios({
       method: 'get',
       url: './assets/default-content.md',
     }).then(function (resp) {
-      self.editor.setValue(resp.data)
-    })
-  },
-  methods: {
-    renderWeChat: function (source) {
-      var output = marked(source, { renderer: this.wxRenderer.getRenderer() })
-      if (this.wxRenderer.hasFootnotes()) {
-        output += this.wxRenderer.buildFootnotes()
+      self.editor.setValue(resp.data);
+    }).catch(function (error) {
+      console.error('Failed to load default content:', error);
+      self.editor.setValue('# 欢迎使用 MDWX\n\n编辑器加载失败，请检查网络连接。');
+    });
+
+    // Reliable Sync Scroll (Mouseover Lock)
+    // Avoids circular loops and jitter by ensuring only the hovered element drives the scroll.
+    this.$nextTick(() => {
+      const leftCol = document.querySelector('.editor-col');
+      const rightCol = document.querySelector('.preview-wrapper');
+
+      let activeSide = null; // 'left' or 'right'
+
+      if (leftCol && rightCol) {
+        // Detect which side is active
+        leftCol.addEventListener('mouseenter', () => { activeSide = 'left'; });
+        rightCol.addEventListener('mouseenter', () => { activeSide = 'right'; });
+
+        // Left controls Right
+        leftCol.addEventListener('scroll', () => {
+          if (activeSide === 'left') {
+            const percentage = leftCol.scrollTop / (leftCol.scrollHeight - leftCol.offsetHeight);
+            // Direct requestAnimationFrame for smoothness could be added, but direct set is usually fine for simple sync
+            rightCol.scrollTop = percentage * (rightCol.scrollHeight - rightCol.offsetHeight);
+          }
+        });
+
+        // Right controls Left
+        rightCol.addEventListener('scroll', () => {
+          if (activeSide === 'right') {
+            const percentage = rightCol.scrollTop / (rightCol.scrollHeight - rightCol.offsetHeight);
+            leftCol.scrollTop = percentage * (leftCol.scrollHeight - leftCol.offsetHeight);
+          }
+        });
       }
-      return output
+
+      // Initial scroll check for themes (Legacy)
+      const themeGroup = document.getElementById('themeScroll');
+      if (themeGroup) {
+        this.checkScroll({ target: themeGroup });
+        themeGroup.addEventListener('scroll', this.checkScroll);
+      }
+    });
+  },
+
+  methods: {
+    /**
+     * 核心渲染逻辑
+     * @param {string} source - Markdown 源码
+     * @returns {string} - 渲染后的 HTML
+     */
+    renderWeChat: function (source) {
+      // Extract Title (First occurrence of # H1)
+      const titleMatch = source.match(/^#\s+(.*)/m);
+      if (titleMatch) {
+        this.title = titleMatch[1];
+        // Remove the extracted title from the body content to prevent duplication
+        source = source.replace(titleMatch[0], '');
+      } else {
+        this.title = 'MDWX，我也可以优雅的写作'; // Default fallback
+      }
+
+      let output = marked(source, { renderer: this.wxRenderer.getRenderer() });
+
+      // 如果存在外部链接引用，追加注脚部分
+      if (this.wxRenderer.hasFootnotes()) {
+        output += this.wxRenderer.buildFootnotes();
+      }
+      return output;
     },
+
+    /**
+     * 编辑器主题切换处理
+     */
     editorThemeChanged: function (editorTheme) {
-      this.editor.setOption('theme', editorTheme)
+      this.editor.setOption('theme', editorTheme);
     },
-    fontChanged: function (fonts) {
+
+    /**
+     * 字体切换处理
+     */
+    fontChanged: function (fontKey) {
+      const fontMap = {
+        'serif': "'PT Serif', 'Songti SC', 'Source Han Serif CN', 'Noto Serif SC', 'SimSun', serif",
+        'sans': "'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif"
+      };
+      const fontStack = fontMap[fontKey] || fontKey;
       this.wxRenderer.setOptions({
-        fonts: fonts
-      })
-      this.refresh()
+        fonts: fontStack
+      });
+      this.refresh();
     },
-    sizeChanged: function(size){
+
+    /**
+     * 字号切换处理
+     */
+    sizeChanged: function (size) {
       this.wxRenderer.setOptions({
         size: size
-      })
-      this.refresh()
+      });
+      this.refresh();
     },
-    themeChanged: function(themeName){
-      var themeName = themeName;
-      var themeObject = this.styleThemes[themeName];
+
+    /**
+     * 排版主题切换处理
+     */
+    themeChanged: function (themeName) {
+      const themeObject = this.styleThemes[themeName];
       this.wxRenderer.setOptions({
         theme: themeObject
-      })
-      this.refresh()
+      });
+      this.refresh();
     },
+
+    /**
+     * 刷新预览区域
+     */
     refresh: function () {
-      this.output = this.renderWeChat(this.editor.getValue())
+      this.output = this.renderWeChat(this.editor.getValue());
     },
+
+    /**
+     * 复制功能
+     * 将渲染区的内容复制到剪贴板，带有样式
+     */
     copy: function () {
-      var clipboardDiv = document.getElementById('output')
+      const clipboardDiv = document.getElementById('output');
       clipboardDiv.focus();
+
       window.getSelection().removeAllRanges();
-      var range = document.createRange();
+      const range = document.createRange();
       range.setStartBefore(clipboardDiv.firstChild);
       range.setEndAfter(clipboardDiv.lastChild);
       window.getSelection().addRange(range);
@@ -110,18 +263,84 @@ var app = new Vue({
       try {
         if (document.execCommand('copy')) {
           this.$message({
-            message: '已复制到剪贴板，请到微信公众平台粘贴', type: 'success',
-          })
-        } else {
-          this.$message({
-            message: '未能复制到剪贴板，请全选后右键复制', type: 'warning'
-          })
+            message: '已复制',
+            type: 'success',
+            center: true,
+            offset: 80,
+            customClass: 'minimal-message',
+            duration: 1500
+          });
         }
-      } catch (err) {
+      } catch (e) {
         this.$message({
-          message: '未能复制到剪贴板，请全选后右键复制', type: 'warning'
-        })
+          message: '❌ 复制失败，请手动全选复制。',
+          type: 'warning',
+          duration: 3000
+        });
+      }
+      window.getSelection().removeAllRanges();
+    },
+
+    /**
+     * Popover 显示时初始化滚动状态
+     * 使用轮询机制确保在弹窗动画完成后准确计算
+     */
+    initScrollState: function () {
+      this.showRightArrow = true; // 默认预显，避免闪烁
+
+      const themeGroup = document.getElementById('themeScroll');
+      if (!themeGroup) return;
+
+      let attempts = 0;
+      const maxAttempts = 10; // 50ms * 10 = 500ms
+
+      const timer = setInterval(() => {
+        attempts++;
+        // 只有当元素真正可见且有宽度时才计算
+        if (themeGroup.clientWidth > 0) {
+          this.checkScroll({ target: themeGroup });
+          // 如果已经成功获取宽度并计算，可以停止轮询吗？
+          // 建议多检查几次以防动画过程中宽度变化，或者直接清除
+          if (attempts > 5) clearInterval(timer);
+        }
+
+        if (attempts >= maxAttempts) clearInterval(timer);
+      }, 50);
+    },
+
+    /**
+     * 检查滚动状态 (For Themes)
+     */
+    checkScroll: function (event) {
+      const el = event.target;
+      if (!el || el.clientWidth === 0) return;
+
+      // 容差值，避免高分屏下的浮点数问题
+      const tolerance = 2;
+
+      this.showLeftArrow = el.scrollLeft > tolerance;
+
+      // 只有当 剩余可滚动距离 > 容差 时才显示右侧按钮
+      // scrollWidth - (scrollLeft + clientWidth) > tolerance
+      const remaining = el.scrollWidth - (el.scrollLeft + el.clientWidth);
+      this.showRightArrow = remaining > tolerance;
+    },
+
+    /**
+     * 横向滚动容器
+     * @param {Event} event - 点击事件
+     * @param {Number} offset - 滚动距离
+     */
+    scrollContainer: function (event, offset) {
+      // Find wrapper then find the group inside it
+      const wrapper = event.target.closest('.scroll-wrapper');
+      if (wrapper) {
+        const group = wrapper.querySelector('.scroll-group');
+        if (group) {
+          group.scrollBy({ left: offset, behavior: 'smooth' });
+          // Note: The 'scroll' event listener on the group will trigger checkScroll
+        }
       }
     }
   }
-})
+});

@@ -1,134 +1,250 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>微信公众号编辑器</title>
+  <title>MDWX - 微信公众号专业排版工具</title>
+  <meta name="description" content="MDWX 是一款专业的微信公众号 Markdown 编辑器，支持一键渲染、自定义主题、代码高亮和外链转注脚。让写作更专注于内容。">
+
   <link rel="shortcut icon" href="favicon.ico">
   <link rel="apple-touch-icon-precomposed" href="favicon.png">
-  <link rel="stylesheet" href="assets/css/vue-eleui.css">
-  <link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.0/lib/theme-chalk/index.css">
-  <link rel="stylesheet" href="codemirror/codemirror.css">
-  <link rel="stylesheet" href="codemirror/theme/base16-light.css">
-  <link rel="stylesheet" href="codemirror/theme/duotone-light.css">
-  <link rel="stylesheet" href="codemirror/theme/monokai.css">
-  <link rel="stylesheet" href="assets/css/app.css">
-  <link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/8.9.1/styles/dracula.min.css">
+
+  <!-- Google Fonts Mirror (稳定访问) -->
+  <link rel="preconnect" href="https://fonts.loli.net">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.loli.net/css2?family=Inter:wght@400;500;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    rel="stylesheet">
+
+  <!-- 引入样式 (使用 360 CDN - Baomitu，国内首选) -->
+  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.14/theme-chalk/index.min.css">
+  <link rel="stylesheet" href="https://lib.baomitu.com/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://lib.baomitu.com/codemirror/5.65.16/theme/base16-light.min.css">
+  <link rel="stylesheet" href="https://lib.baomitu.com/codemirror/5.65.16/theme/duotone-light.min.css">
+  <link rel="stylesheet" href="https://lib.baomitu.com/codemirror/5.65.16/theme/monokai.min.css">
+  <link rel="stylesheet" href="./assets/css/app.css">
+
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
+
 <body>
-  <div id="app" class="container" id="container">
+  <div id="app" class="container">
     <el-container>
       <el-header class="top">
-        <div class="logo">{{ title }}</div>
-        <el-form size="mini" class="ctrl" :inline=true>
-            <el-form-item>
-                <el-select v-model="currentTheme" size="small" placeholder="选择主题样式" @change="themeChanged">
-                  <el-option v-for="theme in themeOption" :key="theme.value" :label="theme.label" :value="theme.value">
-                    <span style="float: left">{{ theme.label }}</span>
-                    <span style="float: right; color: #8492a6; font-size: 14px">{{ theme.author }}</span>
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            <el-form-item>
-              <el-select v-model="currentFont" size="small" placeholder="选择字体" @change="fontChanged">
-                <el-option v-for="font in builtinFonts"  :style="{fontFamily: font.value}"
-                  :key="font.value"
-                  :label="font.label"
-                  :value="font.value">
-                  <span style="float: left">{{ font.label }}</span>
-                  <span style="float: right; color: #8492a6; font-size: 14px" >Abc</span>
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-select v-model="currentSize" size="small" placeholder="选择段落字体大小" @change="sizeChanged">
-                <el-option v-for="size in sizeOption"
-                  :key="size.value"
-                  :label="size.label"
-                  :value="size.value">
-                  <span style="float: left">{{ size.label }}</span>
-                  <span style="float: right; color: #8492a6; font-size: 14px" >{{ size.desc }}</span>
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item id="editortheme">
-                <el-select v-model="currentEditorTheme" size="small" placeholder="选择字体" @change="editorThemeChanged">
-                  <el-option v-for="editorTheme in editorThemes" :key="editorTheme.value" :label="editorTheme.label"
-                    :value="editorTheme.value">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-          <el-button type="primary" size="small" href="#" @click="copy" class="copy-button">复制</el-button>
-          <el-button class="about" size="small" @click="aboutDialogVisible = true">关于</el-button>
-          </el-form>
-      </el-header>
-      <el-main class="main-body">
-        <el-row :gutter="10" class="main-section">
-          <el-col :span="12">
-            <textarea
-              id="editor"
-              type="textarea"
-              placeholder="Your markdown here."
-              v-model="source">
-            </textarea>
-          </el-col>
-          <el-col :span="12" class="preview-wrapper">
-            <section>
-              <div class="preview" contenteditable="true">
-                <div id="output" v-html="output">
+        <div class="logo">
+          <span class="logo-text">MDWX</span>
+        </div>
+        <div class="ctrl">
+          <el-popover placement="bottom" trigger="click" popper-class="format-popover" width="340">
+            <div class="format-menu">
+
+              <!-- 1. Themes (3 Columns) -->
+              <div class="ui-section">
+                <span class="ui-label">排版主题</span>
+                <div class="ui-grid cols-3">
+                  <div class="ui-option" v-for="item in themeOption" :key="item.value"
+                    :class="{active: currentTheme===item.value}"
+                    @click="currentTheme=item.value; themeChanged(item.value)">
+                    {{ item.label }}
+                  </div>
                 </div>
               </div>
-            </section>
-          </el-col>
-        </el-row>
-      </el-main>
-    </el-container>
 
-    <el-dialog title="关于" :visible.sync="aboutDialogVisible" width="30%" center>
-      <div class="about">
-        <h3>Markdown Cool 有什么用？</h3>
-        <p>通过 Markdown 实现微信公众号排版，支持一键复制；</p>
-        <br>
-        <h3>关于我</h3>
-        <p>我是 Tickmao。如果你喜欢我的工具</p>
-        <p>欢迎关注我的公众号 【Tickmao】，<a href='https://www.tickmao.com' target='_blank' class='url'>博客</a> 或 <a href='https://github.com/tickmao' target='_blank' class='url'>Github</a></p>
-        <br>
-        <div>
-            <h3>支持我</h3>
-            <P>如果对你有所帮助，不妨请我吃个鸡腿。</P>
-            <p>PS : 最好附上你的呢称，同时给 Tickmao 捎句话吧！</p>
-            <br>
-          <img src="./assets/images/wechat_qrcode.jpg" style="width: 60%; display: block; margin: 0 auto;"/>
+              <!-- 2. Fonts (2 Columns) -->
+              <div class="ui-section">
+                <span class="ui-label">字体选择</span>
+                <div class="ui-grid cols-2">
+                  <div class="ui-option" :class="{active: currentFont === 'serif'}"
+                    @click="currentFont = 'serif'; fontChanged('serif')">衬线体</div>
+                  <div class="ui-option" :class="{active: currentFont === 'sans'}"
+                    @click="currentFont = 'sans'; fontChanged('sans')">无衬线</div>
+                </div>
+              </div>
+
+              <!-- 3. Size (5 Columns) -->
+              <div class="ui-section">
+                <span class="ui-label">正文字号</span>
+                <div class="ui-grid cols-5">
+                  <div class="ui-option" v-for="item in sizeOption" :key="item.value"
+                    :class="{active: currentSize===item.value}"
+                    @click="currentSize=item.value; sizeChanged(item.value)">
+                    {{ item.value.replace('px', '') }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Editor Theme (3 Columns) -->
+              <div class="ui-section">
+                <span class="ui-label">编辑器配色</span>
+                <div class="ui-grid cols-3">
+                  <div class="ui-option" :class="{active: currentEditorTheme==='base16-light'}"
+                    @click="currentEditorTheme='base16-light'; editorThemeChanged('base16-light')">Light</div>
+                  <div class="ui-option" :class="{active: currentEditorTheme==='duotone-light'}"
+                    @click="currentEditorTheme='duotone-light'; editorThemeChanged('duotone-light')">Soft</div>
+                  <div class="ui-option" :class="{active: currentEditorTheme==='monokai'}"
+                    @click="currentEditorTheme='monokai'; editorThemeChanged('monokai')">Dark</div>
+                </div>
+              </div>
+
+            </div>
+            <el-button slot="reference" type="text" class="aa-button" title="格式设置">
+              Aa
+            </el-button>
+          </el-popover>
+
+          <el-button class="about" type="text" @click="aboutDialogVisible = true" title="关于">
+            i
+          </el-button>
+
+          <el-button class="copy-button" type="primary" @click="copy">
+            复制全文
+          </el-button>
         </div>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button size="small" @click="aboutDialogVisible = false">关闭</el-button>
-      </span>
-    </el-dialog>
+      </el-header>
+      <el-container class="main-body">
+        <!-- Editor Section -->
+        <div class="editor-col">
+          <div class="code-mirror-wrapper">
+            <textarea id="editor" name="editor"></textarea>
+          </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="preview-wrapper">
+          <div class="preview">
+            <div class="wx-header">
+              <!-- WeChat Precise Icons -->
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 18l-6-6 6-6" stroke="#000000" stroke-width="1.2" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+
+              <span class="wx-title" style="font-size: 16px; font-weight: 600; margin: 0;">MDWX</span>
+
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="6" cy="12" r="1.1" fill="#000000" />
+                <circle cx="12" cy="12" r="1.1" fill="#000000" />
+                <circle cx="18" cy="12" r="1.1" fill="#000000" />
+              </svg>
+            </div>
+
+            <div class="wx-content">
+              <div class="wx-article-header">
+                <h1 class="wx-title">{{ title }}</h1>
+                <div class="wx-meta">
+                  <span class="wx-original">原创</span>
+                  <span class="wx-author">MDWX</span>
+                  <span class="wx-account-link">MDWX</span>
+                  <span class="wx-time">{{ currentDate }}</span>
+                </div>
+              </div>
+              <div id="output" v-html="output"></div>
+            </div>
+
+            <div class="wx-footer">
+              <div class="wx-footer-left">
+                <div class="wx-avatar-circle">M</div>
+                <span class="wx-footer-text">MDWX</span>
+              </div>
+              <div class="wx-footer-right">
+                <div class="wx-action-item">
+                  <i class="ph-bold ph-thumbs-up wx-icon"></i>
+                  <span class="wx-action-num">赞</span>
+                </div>
+                <div class="wx-action-item">
+                  <i class="ph-bold ph-share-network wx-icon"></i>
+                  <span class="wx-action-num">分享</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </el-container>
+
+      <el-dialog title="关于 MDWX" :visible.sync="aboutDialogVisible" width="420px" center custom-class="about-dialog">
+        <div class="about-content">
+          <!-- 1. Intro -->
+          <p class="brand-intro">
+            MDWX 是一款专为微信公众号设计的排版工具。它能将 Markdown 直接转换为微信公众号排版样式，简洁美观，让写作更专注于内容本身。
+          </p>
+
+          <!-- 2. Features Grid -->
+          <div class="brand-features">
+            <div class="brand-feature-item">
+              <i class="ph-bold ph-magic-wand"></i>
+              <span>完美适配微信</span>
+            </div>
+            <div class="brand-feature-item">
+              <i class="ph-bold ph-palette"></i>
+              <span>多款预设主题</span>
+            </div>
+            <div class="brand-feature-item">
+              <i class="ph-bold ph-code"></i>
+              <span>代码支持高亮</span>
+            </div>
+            <div class="brand-feature-item">
+              <i class="ph-bold ph-link"></i>
+              <span>外链转换注脚</span>
+            </div>
+          </div>
+
+          <!-- 3. Author Card -->
+          <div class="author-card">
+            <div class="author-info">
+              <h3>Tickmao</h3>
+              <p>
+                专注排版美学与写作体验。<br>
+                为文字赋予最优雅的形式。
+              </p>
+              <div class="author-actions">
+                <a href='https://www.tickmao.com' target='_blank' class="author-link">
+                  Blog <i class="ph-bold ph-arrow-up-right"></i>
+                </a>
+                <a href='https://github.com/tickmao' target='_blank' class="author-link">
+                  Github <i class="ph-bold ph-arrow-up-right"></i>
+                </a>
+              </div>
+              <p class="author-copyright">2017 - 2025 ©版权所有</p>
+            </div>
+            <div class="author-qr">
+              <img src="assets/images/wechat_qrcode.jpg" alt="QR Code">
+            </div>
+          </div>
+        </div>
+
+      </el-dialog>
   </div>
 
+  <!-- Scripts -->
   <script src="assets/scripts/axios.min.js"></script>
   <script src="assets/scripts/marked.min.js"></script>
   <script src="assets/scripts/vue.js"></script>
   <script src="assets/scripts/vue-eleui.js"></script>
   <script src="assets/scripts/FuriganaMD.js"></script>
-  <script src="codemirror/codemirror.js"></script>
-  <script src="codemirror/mode/markdown/markdown.js"></script>
+
+  <!-- CodeMirror (Baomitu) -->
+  <script src="https://lib.baomitu.com/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://lib.baomitu.com/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
+
+  <!-- Themes -->
   <script src="assets/scripts/themes/default.js"></script>
-  <script src="assets/scripts/themes/lupeng.js"></script>
   <script src="assets/scripts/themes/tickmao.js"></script>
+  <script src="assets/scripts/themes/focus-medium.js"></script>
+  <script src="assets/scripts/themes/focus-instapaper.js"></script>
+  <script src="assets/scripts/themes/focus-shimo.js"></script>
+  <script src="assets/scripts/themes/focus-orange.js"></script>
+
+  <!-- Renderer & Logic -->
   <script src="assets/scripts/renderers/wx-renderer.js"></script>
   <script src="assets/scripts/editor.js"></script>
-  <script src="//cdn.bootcss.com/highlight.js/8.9.1/highlight.min.js"></script>
 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-4178606-10"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'UA-4178606-10');
-  </script>
-  <script >hljs.initHighlightingOnLoad();</script>
+  <!-- Highlight.js (Baomitu) -->
+  <link rel="stylesheet" href="https://lib.baomitu.com/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <script src="https://lib.baomitu.com/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
+
 </html>
