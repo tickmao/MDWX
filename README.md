@@ -13,7 +13,7 @@
 https://mdwx.tickmao.com/
 
 ## 缩略图
-![bc8c61655a2d61ca5881ff5f597e4060.png](https://i.mji.rip/2025/12/13/bc8c61655a2d61ca5881ff5f597e4060.png)
+![6733148b3e28d1dcf335aef1a070fb22.png](https://i.mji.rip/2025/12/14/6733148b3e28d1dcf335aef1a070fb22.png)
 
 ## 声明
 
