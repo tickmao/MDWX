@@ -48,10 +48,14 @@
 /* Premium Scrollbars: Hidden for Zen Experience */
 ::-webkit-scrollbar {
   display: none;
-  /* Hide scrollbar for Chrome/Safari/Opera */
-  width: 0px;
-  background: transparent;
 }
+
+/* FOUC Prevention */
+[v-cloak] {
+  display: none !important;
+}
+
+/* Hide scrollbar properties (redundant with display:none) */
 
 /* For Firefox */
 * {
@@ -75,6 +79,32 @@ body {
   background-color: var(--surface);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.author-link {
+  color: #666666;
+  /* Strict B&W: Neutral Grey */
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 999px;
+  /* Pill Shape */
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: transparent;
+  /* Default */
+}
+
+.author-link:hover {
+  background: #000000;
+  /* Strict B&W: Pure Black */
+  color: #ffffff;
+  /* Strict B&W: Pure White */
+  /* Consistent with Header Buttons */
+  opacity: 1;
+  text-decoration: none;
+  transform: translateY(-1px);
+  /* Subtle lift matches other interactions */
 }
 
 a {
@@ -153,30 +183,28 @@ a:hover {
 /* Aa Button - Circle Stroke */
 .aa-button {
   width: 36px !important;
-  /* Increased to 36px */
   height: 36px !important;
   border-radius: 50% !important;
-  border: 1.5px solid rgba(0, 0, 0, 0.08) !important;
-  /* Lighter stroke */
+  /* Design System: Subtler stroke */
+  border: 1px solid #ddd !important;
   padding: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-right: 2px !important;
-  /* Reduced to 2px */
+  /* Relaxed spacing handling by gap */
   background: transparent !important;
   font-family: var(--font-serif) !important;
-  /* Brand Font */
   font-size: 16px !important;
-  /* Balanced at 16px */
   font-weight: 500 !important;
   color: #1a1a1a !important;
 }
 
 .aa-button:hover {
-  border-color: rgba(0, 0, 0, 0.2) !important;
-  background-color: rgba(0, 0, 0, 0.02) !important;
+  /* Design System: Active State (Black/White) */
+  background-color: #000 !important;
+  color: #fff !important;
+  border-color: #000 !important;
   transform: translateY(-1px);
 }
 
@@ -216,18 +244,16 @@ a:hover {
 /* About Button - Circle Stroke (Match Aa) */
 .about {
   width: 36px !important;
-  /* Increased to 36px */
   height: 36px !important;
   border-radius: 50% !important;
-  border: 1.5px solid rgba(0, 0, 0, 0.08) !important;
-  /* Lighter stroke */
+  border: 1px solid #ddd !important;
+  /* Consistent Stroke */
   padding: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   background-color: transparent !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Reduced to 2px */
   font-family: var(--font-serif) !important;
   font-weight: 500 !important;
   font-style: italic !important;
@@ -235,15 +261,12 @@ a:hover {
   color: #1a1a1a !important;
 }
 
-.about i {
-  font-size: 18px;
-  /* Increased to 18px for balance */
-  color: #1a1a1a;
-}
-
 .about:hover {
-  border-color: rgba(0, 0, 0, 0.2) !important;
-  background-color: rgba(0, 0, 0, 0.02) !important;
+  /* Design System: Active State */
+  background-color: #000 !important;
+  border-color: #000 !important;
+  color: #fff !important;
+  /* Fixed: Text turns white */
   transform: translateY(-1px);
 }
 
@@ -269,11 +292,11 @@ a:hover {
 
 /* Remove Default Element UI Styles */
 .about-dialog {
-  border-radius: var(--radius-m) !important;
-  box-shadow: var(--shadow-lg) !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
-  background: #fff !important;
-  overflow: hidden !important;
+  border-radius: 20px !important;
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12) !important;
+  margin-top: 10vh !important;
+  /* Move dialog higher up */
 }
 
 .about-dialog .el-dialog__header {
@@ -289,127 +312,199 @@ a:hover {
   letter-spacing: -0.02em;
 }
 
+/* =========================================
+   ABOUT DIALOG (PREMIUM REDESIGN)
+   ========================================= */
+
+.about-dialog .el-dialog__header {
+  display: none !important;
+  /* Custom Header */
+}
+
 .about-dialog .el-dialog__body {
-  padding: 24px 32px 32px 32px !important;
+  padding: 0 !important;
 }
 
-/* Introduction Text */
-.brand-intro {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #555;
-  margin-bottom: 24px;
+.about-content {
+  padding: 40px 32px 32px 32px;
   text-align: center;
-  /* Centered Intro */
+  font-family: var(--font-sans);
 }
 
-/* Feature List (Grid Layout) */
+/* 1. Header */
+/* 1. Header (Refined Vertical Stack) */
+.about-header {
+  margin-bottom: 24px;
+}
+
+.about-logo {
+  width: 48px;
+  /* Reduced from 64px */
+  height: 48px;
+  /* Reduced from 64px */
+  background: #000;
+  border-radius: 12px;
+  /* Adjusted radius for smaller size */
+  margin: 0 auto 12px;
+  /* Center with reduced margin */
+  display: flex;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  /* Softer shadow for lighter feel */
+}
+
+.about-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  /* Match container */
+}
+
+.about-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  /* Reduced from 32px to 24px */
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.brand-intro {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* 2. Features Grid (App Store Style) */
 .brand-features {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 32px;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  /* Tightly packed */
+  margin-bottom: 24px;
+  /* Reduced from 40px */
 }
 
 .brand-feature-item {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.feature-icon {
+  width: 40px;
+  /* Reduced from 48px */
+  height: 40px;
+  /* Reduced from 48px */
+  /* De-boxing: Remove background */
+  background: transparent;
+  /* border-radius: 16px; optional since no bg */
+  display: flex;
   align-items: center;
   justify-content: center;
-  /* Centered Grid Items */
-  font-size: 13px;
-  color: #333;
+  color: #000;
+  font-size: 20px;
+  /* Removed transition and hover effects to indicate static content */
+}
+
+/* Removed .brand-feature-item:hover rule to prevent misleading click affordance */
+
+.brand-feature-item span {
+  font-size: 12px;
+  color: #888;
   font-weight: 500;
 }
 
-.brand-feature-item i {
-  margin-right: 8px;
-  color: #000;
-  font-size: 16px;
+.feature-icon i {
+  font-size: 20px;
+  /* Reduced to 20px */
+  /* Scale up icon size for better visibility w/o bg */
+  color: #1a1a1a;
 }
 
-/* Author Card Container */
+/* 3. Author Card (Vertical Stack Layout) */
 .author-card {
-  background: var(--surface-hover);
-  border-radius: var(--radius-m);
-  padding: 16px 20px;
-  /* Reduced height padding for balance */
+  background: transparent;
+  border-radius: 0;
+  padding: 24px 0 16px;
+  /* Reduced top padding from 32px */
+  /* More top padding */
   display: flex;
+  flex-direction: column;
+  /* Vertical Stack */
   align-items: center;
-  /* Ensure strict vertical centering */
-  justify-content: space-between;
+  /* Center Align */
+  justify-content: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-/* Author Info Block */
+/* Group 1: Author Info */
 .author-info {
-  flex: 1;
-  position: relative;
-  top: 4px;
-  /* Overall Visual Depression */
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .author-info h3 {
-  font-family: var(--font-serif);
-  font-size: 16px;
+  margin: 0 0 8px 0;
+  font-size: 18px;
   font-weight: 700;
-  color: #000;
-  margin-top: 0;
-  /* Reset top margin for alignment */
-  margin-bottom: 2px;
+  font-family: var(--font-serif);
+  color: #1a1a1a;
 }
 
-.author-copyright {
-  font-size: 11px;
-  color: #999;
-  margin-top: 16px;
-  position: relative;
-  top: 4px;
-  /* Visual offset without breaking center alignment */
-  margin-bottom: 0;
-  font-family: var(--font-sans);
-  letter-spacing: 0.02em;
-}
-
-.author-info p {
-  font-size: 12px;
-  color: #666;
-  line-height: 1.5;
-  margin-bottom: 12px;
-}
-
-.author-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.author-link {
-  font-size: 12px;
-  font-weight: 600;
-  color: #000;
-  text-decoration: none;
-  opacity: 0.6;
-  transition: opacity 0.2s;
+.author-links {
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  /* Slightly larger links */
+  color: #999;
 }
 
-.author-link:hover {
-  opacity: 1;
-}
-
-.author-link i {
-  margin-left: 4px;
-  font-size: 10px;
-}
-
-/* QR Code */
+/* Group 2: QR Code */
 .author-qr {
-  width: 160px;
-  height: 160px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  background: #fff;
-  padding: 4px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.qr-code-wrapper {
+  width: 120px;
+  /* Specific size for vertical visual */
+  height: 120px;
+  overflow: hidden;
+  border-radius: 0;
+  /* No radius needed visually if blended */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Optional: Zoom effect can be kept or removed.
+     Keeping it simple for now, or retaining previous zoom logic if user liked it.
+     Let's clean it up to show the full QR clearly. */
+}
+
+/* Ensure QR image fits perfectly centered */
+.qr-code-wrapper img {
+  width: 120%;
+  /* Slight zoom to crop borders if needed, or 100% */
+  height: 120%;
+  object-fit: contain;
+}
+
+
+
+.qr-label {
+  font-size: 10px;
+  color: #999;
+  font-weight: 500;
+  display: block;
+  transform: scale(0.9);
 }
 
 .author-qr img {
@@ -534,15 +629,18 @@ a:hover {
   flex-direction: column;
   overflow: hidden;
   /* Round corners clip content */
-  box-sizing: content-box;
+  box-sizing: border-box;
+  /* Fix: Ensure padding/border doesn't increase width */
+  flex-shrink: 0;
+  /* Fix: Prevent shrinking */
   position: relative;
 }
 
 /* 1. Top Navigation Bar */
 .wx-header {
-  height: 56px;
+  height: 64px;
   /* Compact Mobile Header */
-  min-height: 56px;
+  min-height: 64px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -564,6 +662,10 @@ a:hover {
   padding: 20px 20px 30px 20px;
   /* User Request: Reduced gap to 30px */
   background: #fff;
+  width: 100%;
+  /* Fix: Ensure it fills the container */
+  box-sizing: border-box;
+  /* Fix: Padding inside width */
 }
 
 /* 3. Article Meta Header */
@@ -627,7 +729,7 @@ a:hover {
   padding: 12px 20px;
   /* Balanced Top/Bottom for true centering */
   background: #fff;
-  border-top: 0.5px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   z-index: 10;
 }
 
@@ -649,8 +751,10 @@ a:hover {
   align-items: center;
 
   /* Text Logo Styles */
-  background: #fff;
-  color: #000;
+  background: #000;
+  /* User Request: Black background */
+  color: #fff;
+  /* User Request: White text */
   font-weight: 700;
   font-size: 18px;
   font-family: var(--font-serif);
@@ -723,14 +827,13 @@ svg.wx-icon {
 }
 
 /* The following rules were removed as they were replaced by the new i.wx-icon and .wx-action-item rules */
-/*
-.wx-icon {
+/* .wx-icon {
   width: 20px;
   height: 20px;
   object-fit: contain;
   opacity: 0.8;
-  /* stroke property not needed for img */
-}
+  /* stroke property not needed for img * /
+} */
 
 .wx-action-num {
   font-size: 12px;
@@ -836,10 +939,12 @@ svg.wx-icon {
   justify-content: center;
   height: 32px;
   /* Standard Height */
-  border-radius: var(--radius-s);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: #555;
+  /* Design System: Pill Shape (999px) */
+  border-radius: 999px;
+  border: 1px solid #E5E5E5;
+  /* Light subtle border */
+  background: #fff;
+  color: #333;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -849,19 +954,22 @@ svg.wx-icon {
 
 /* Option Hover */
 .ui-option:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-hover);
+  background: #f7f7f7;
+  border-color: #ddd;
   color: #000;
   transform: translateY(-1px);
 }
 
 /* Option Active */
 .ui-option.active {
-  background: var(--primary);
+  background: #000;
+  /* Pure Black */
   color: #fff;
-  border-color: var(--primary);
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  /* Pure White */
+  border-color: #000;
+  font-weight: 500;
+  /* Consistent weight */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
 }
 
@@ -946,9 +1054,7 @@ svg.wx-icon {
   white-space: nowrap;
 }
 
-.grid-item:last-child {
-  /* No special border logic needed */
-}
+
 
 .grid-item:hover {
   background-color: #fff;
@@ -1394,4 +1500,390 @@ code {
 /* Fix Gutter Line Integration */
 .editor-col:has(.cm-s-monokai) .CodeMirror-gutters {
   border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* =========================================
+   MOBILE ADAPTATION (PREMIUM)
+   ========================================= */
+
+@media screen and (max-width: 768px) {
+
+  /* 1. Reset & Global */
+  body,
+  html {
+    overflow: hidden;
+    /* Prevent body scroll */
+  }
+
+  .main-body {
+    padding-top: 50px !important;
+    /* Smaller header */
+    height: 100dvh;
+    /* Dynamic Viewport Height */
+    display: block !important;
+    /* Stacked layout */
+  }
+
+  /* 2. Mobile Navigation (Segmented Control) */
+  .mobile-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    /* Reducing width slightly */
+    height: 32px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    padding: 2px;
+    display: flex;
+    box-sizing: border-box;
+    z-index: 120;
+    /* Ensure on top */
+  }
+
+  /* Force Controls to Right */
+  .ctrl {
+    margin-left: auto;
+    /* Push to right when logo is hidden */
+    gap: 8px;
+    /* Tighter gap */
+    z-index: 130;
+    /* Above nav */
+  }
+
+  /* Hide specific desktop controls on mobile */
+  .ctrl .copy-button {
+    display: none !important;
+    /* Save space, move to drawer */
+  }
+
+  .ctrl .about {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 14px !important;
+  }
+
+  .aa-button {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 14px !important;
+  }
+
+  .seg-control {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: relative;
+  }
+
+  .seg-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+  }
+
+  .seg-item.active {
+    background: #fff;
+    color: #000;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  /* 3. Mobile View Containers */
+  .mobile-view {
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 200px;
+    /* Space for keyboard/home indicator */
+  }
+
+  .editor-col {
+    border-right: none;
+    padding-top: 10px;
+  }
+
+  .code-mirror-wrapper {
+    padding: 0 20px;
+    /* Reduced padding */
+  }
+
+  /* Preview Card Reset (Mobile Specific) */
+  .preview-wrapper.mobile-view {
+    display: block;
+    /* Override flex */
+    flex: none;
+    border-left: none;
+    padding: 20px 0 80px 0;
+    /* Add bottom padding for FAB */
+    background: #f7f7f7;
+    position: absolute;
+    /* Overlay */
+    top: 50px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    /* Increase Z-Index to be safe */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-preview-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 100%;
+    margin: 0;
+    overflow: visible !important;
+    /* Allow content to scroll */
+    height: auto !important;
+  }
+
+  /* 4. Bottom Drawer (Action Sheet) */
+  .drawer-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 900;
+  }
+
+  .mobile-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 24px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    z-index: 1000;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.1);
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .drawer-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    margin: 0 auto 20px auto;
+  }
+
+  /* Reuse existing UI Grid inside drawer */
+  .ui-section {
+    margin-bottom: 24px;
+  }
+
+  /* Mobile Floating Copy Button (FAB) */
+  .mobile-fab-copy {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 100px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    z-index: 800;
+    /* Above content, below drawer */
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  .mobile-fab-copy:active {
+    transform: translateX(-50%) scale(0.95);
+  }
+
+  .mobile-fab-copy i {
+    display: none !important;
+    /* Hide icon as requested */
+  }
+
+  /* Mobile Header Logo Adjustment */
+  .top .logo {
+    display: flex !important;
+    /* Force show */
+  }
+
+  .logo-text {
+    font-size: 22px !important;
+    /* Optimized for mobile visibility */
+  }
+}
+
+/* 5. Transitions */
+/* Fade Slide Animation */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-slide-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Slide Up Drawer */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.slide-up-enter,
+.slide-up-leave-to {
+  transform: translateY(100%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* MOBILE ADAPTATION FOR ABOUT DIALOG */
+@media screen and (max-width: 480px) {
+  .about-dialog {
+    width: 90% !important;
+    max-width: 360px;
+  }
+
+  .about-content {
+    padding: 32px 24px 24px;
+  }
+
+  /* .brand-features removed to inherit repeat(4, 1fr) from desktop */
+
+  .author-card {
+    padding: 16px;
+    /* Ensure tight padding on mobile */
+  }
+
+  .author-right {
+    padding-left: 12px;
+    /* Tighter padding */
+    border-left: 1px solid #eee;
+  }
+
+  /* Compacting Layout Elements */
+  .author-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+  }
+
+  .author-left {
+    gap: 10px;
+    min-width: 0;
+    /* Enable shrinking for children */
+    overflow: hidden;
+    /* Prevent spill */
+  }
+
+  .author-details {
+    flex: 1;
+    /* Take remaining space */
+    min-width: 0;
+    /* TEXT WRAP FIX: Allow container to shrink below content size if needed */
+  }
+
+  .author-actions {
+    white-space: nowrap;
+    /* Prevent wrapping */
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Graceful degradation */
+  }
+}
+
+/* =========================================
+   TOAST NOTIFICATION (Strict B&W Pill)
+   ========================================= */
+
+/* Override Element UI Message */
+body .el-message {
+  border-radius: 99px !important;
+  /* Pill Shape */
+  background-color: #000 !important;
+  /* Pure Black */
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  /* Subtle border */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+  padding: 10px 24px !important;
+  min-width: unset !important;
+  /* Allow shrinking */
+  top: 30px !important;
+}
+
+/* Success State (Override Green) */
+body .el-message--success {
+  background-color: #000 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Warning State (Override Orange) */
+body .el-message--warning {
+  background-color: #000 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Error State (Override Red) */
+body .el-message--error {
+  background-color: #000 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Info State (Override Grey) */
+body .el-message--info {
+  background-color: #000 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Icon Color (Universal White) */
+body .el-message .el-message__icon {
+  color: #fff !important;
+  font-size: 16px !important;
+}
+
+/* Text Content (Universal White) */
+body .el-message .el-message__content {
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  font-family: 'Inter', sans-serif !important;
 }

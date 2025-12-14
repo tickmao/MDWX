@@ -11,37 +11,47 @@
   <link rel="shortcut icon" href="favicon.ico">
   <link rel="apple-touch-icon-precomposed" href="favicon.png">
 
-  <!-- Google Fonts Mirror (稳定访问) -->
-  <link rel="preconnect" href="https://fonts.loli.net">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.loli.net/css2?family=Inter:wght@400;500;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-    rel="stylesheet">
+  <!-- Preload Critical Fonts -->
+  <link rel="preload" href="./assets/vendor/fonts/Inter-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="./assets/vendor/fonts/Inter-Bold.ttf" as="font" type="font/ttf" crossorigin>
 
-  <!-- 引入样式 (使用 360 CDN - Baomitu，国内首选) -->
-  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.15.14/theme-chalk/index.min.css">
-  <link rel="stylesheet" href="https://lib.baomitu.com/codemirror/5.65.16/codemirror.min.css">
-  <link rel="stylesheet" href="https://lib.baomitu.com/codemirror/5.65.16/theme/base16-light.min.css">
-  <link rel="stylesheet" href="https://lib.baomitu.com/codemirror/5.65.16/theme/duotone-light.min.css">
-  <link rel="stylesheet" href="https://lib.baomitu.com/codemirror/5.65.16/theme/monokai.min.css">
+  <!-- Local Fonts -->
+  <link rel="stylesheet" href="./assets/vendor/fonts/fonts.css">
+
+  <!-- 引入样式 (本地资源) -->
+  <link rel="stylesheet" href="./assets/vendor/element-ui/index.min.css">
+  <link rel="stylesheet" href="./assets/vendor/codemirror/codemirror.min.css">
+  <link rel="stylesheet" href="./assets/vendor/codemirror/theme/base16-light.min.css">
+  <link rel="stylesheet" href="./assets/vendor/codemirror/theme/duotone-light.min.css">
+  <link rel="stylesheet" href="./assets/vendor/codemirror/theme/monokai.min.css">
   <link rel="stylesheet" href="./assets/css/app.css">
 
-  <!-- Phosphor Icons -->
+  <!-- Phosphor Icons (CDN) -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
-  <div id="app" class="container">
+  <div id="app" class="container" v-cloak>
     <el-container>
       <el-header class="top">
+        <!-- Desktop Logo -->
         <div class="logo">
           <span class="logo-text">MDWX</span>
         </div>
-        <div class="ctrl">
-          <el-popover placement="bottom" trigger="click" popper-class="format-popover" width="340">
-            <div class="format-menu">
 
-              <!-- 1. Themes (3 Columns) -->
+        <!-- Mobile Segmented Control -->
+        <div class="mobile-nav" v-show="isMobile">
+          <div class="seg-control">
+            <div class="seg-item" :class="{active: activeView==='editor'}" @click="activeView='editor'">编辑</div>
+            <div class="seg-item" :class="{active: activeView==='preview'}" @click="activeView='preview'">预览</div>
+          </div>
+        </div>
+
+        <div class="ctrl">
+          <!-- Desktop Popover (Hidden on Mobile) -->
+          <el-popover v-if="!isMobile" placement="bottom" trigger="click" popper-class="format-popover" width="340">
+            <div class="format-menu">
+              <!-- Theme Options Component -->
               <div class="ui-section">
                 <span class="ui-label">排版主题</span>
                 <div class="ui-grid cols-3">
@@ -52,8 +62,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- 2. Fonts (2 Columns) -->
               <div class="ui-section">
                 <span class="ui-label">字体选择</span>
                 <div class="ui-grid cols-2">
@@ -63,8 +71,6 @@
                     @click="currentFont = 'sans'; fontChanged('sans')">无衬线</div>
                 </div>
               </div>
-
-              <!-- 3. Size (5 Columns) -->
               <div class="ui-section">
                 <span class="ui-label">正文字号</span>
                 <div class="ui-grid cols-5">
@@ -75,8 +81,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- 4. Editor Theme (3 Columns) -->
               <div class="ui-section">
                 <span class="ui-label">编辑器配色</span>
                 <div class="ui-grid cols-3">
@@ -88,47 +92,87 @@
                     @click="currentEditorTheme='monokai'; editorThemeChanged('monokai')">Dark</div>
                 </div>
               </div>
-
             </div>
             <el-button slot="reference" type="text" class="aa-button" title="格式设置">
               Aa
             </el-button>
           </el-popover>
 
+          <!-- Mobile Trigger (Calls Drawer) -->
+          <el-button v-else type="text" class="aa-button" @click="mobileMenuVisible = true">
+            Aa
+          </el-button>
+
           <el-button class="about" type="text" @click="aboutDialogVisible = true" title="关于">
             i
           </el-button>
 
           <el-button class="copy-button" type="primary" @click="copy">
-            复制全文
+            <span v-if="!isMobile">复制全文</span>
+            <span v-else>复制</span>
           </el-button>
         </div>
       </el-header>
       <el-container class="main-body">
+
         <!-- Editor Section -->
-        <div class="editor-col">
-          <div class="code-mirror-wrapper">
-            <textarea id="editor" name="editor"></textarea>
+        <!-- Logic: Show if Desktop OR (Mobile AND ActiveTab is Editor) -->
+        <transition name="fade-slide" mode="out-in">
+          <div class="editor-col" v-show="!isMobile || activeView === 'editor'" :class="{ 'mobile-view': isMobile }">
+            <div class="code-mirror-wrapper">
+              <textarea id="editor" name="editor"></textarea>
+            </div>
+          </div>
+        </transition>
+
+        <!-- Desktop Preview (Fixed Right Sidebar) -->
+        <!-- Desktop Preview (Fixed Right Sidebar) -->
+        <div class="preview-wrapper desktop-preview" v-show="!isMobile">
+          <div class="preview">
+            <div class="wx-header">
+              <i class="ph ph-caret-left" style="font-size: 22px;"></i>
+              <span class="wx-title" style="font-size: 16px; font-weight: 600; margin: 0;">MDWX</span>
+              <i class="ph ph-dots-three" style="font-size: 24px;"></i>
+            </div>
+            <div class="wx-content">
+              <div class="wx-article-header">
+                <h1 class="wx-title">{{ title }}</h1>
+                <div class="wx-meta">
+                  <span class="wx-original">原创</span>
+                  <span class="wx-author">MDWX</span>
+                  <span class="wx-account-link">MDWX</span>
+                  <span class="wx-time">{{ currentDate }}</span>
+                </div>
+              </div>
+              <div id="output-desktop" v-html="output"></div>
+            </div>
+            <div class="wx-footer">
+              <div class="wx-footer-left">
+                <div class="wx-avatar-circle">M</div>
+                <span class="wx-footer-text">MDWX</span>
+              </div>
+              <div class="wx-footer-right">
+                <div class="wx-action-item"><i class="ph ph-thumbs-up wx-icon"></i><span class="wx-action-num">赞</span>
+                </div>
+                <div class="wx-action-item"><i class="ph ph-share-fat wx-icon"></i><span class="wx-action-num">分享</span>
+                </div>
+                <div class="wx-action-item"><i class="ph ph-heart wx-icon"></i><span class="wx-action-num">10</span>
+                </div>
+                <div class="wx-action-item"><i class="ph ph-chat-centered wx-icon"></i><span
+                    class="wx-action-num">写留言</span></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Preview Section -->
-        <div class="preview-wrapper">
-          <div class="preview">
+        <!-- Mobile Preview (Full Screen Overlay) -->
+        <!-- Use v-show instead of v-if to ensure DOM readiness and avoid re-render glitches -->
+        <div class="preview-wrapper mobile-view" v-show="isMobile && activeView === 'preview'">
+          <div class="preview mobile-preview-card">
             <div class="wx-header">
-              <!-- WeChat Precise Icons -->
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 18l-6-6 6-6" stroke="#000000" stroke-width="1.2" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-
+              <i class="ph ph-caret-left" style="font-size: 22px;"></i>
               <span class="wx-title" style="font-size: 16px; font-weight: 600; margin: 0;">MDWX</span>
-
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="6" cy="12" r="1.1" fill="#000000" />
-                <circle cx="12" cy="12" r="1.1" fill="#000000" />
-                <circle cx="18" cy="12" r="1.1" fill="#000000" />
-              </svg>
+              <i class="ph ph-dots-three" style="font-size: 24px;"></i>
             </div>
 
             <div class="wx-content">
@@ -141,7 +185,7 @@
                   <span class="wx-time">{{ currentDate }}</span>
                 </div>
               </div>
-              <div id="output" v-html="output"></div>
+              <div id="output-mobile" v-html="output"></div>
             </div>
 
             <div class="wx-footer">
@@ -150,72 +194,141 @@
                 <span class="wx-footer-text">MDWX</span>
               </div>
               <div class="wx-footer-right">
-                <div class="wx-action-item">
-                  <i class="ph-bold ph-thumbs-up wx-icon"></i>
-                  <span class="wx-action-num">赞</span>
+                <div class="wx-action-item"><i class="ph ph-thumbs-up wx-icon"></i><span class="wx-action-num">赞</span>
                 </div>
-                <div class="wx-action-item">
-                  <i class="ph-bold ph-share-network wx-icon"></i>
-                  <span class="wx-action-num">分享</span>
+                <div class="wx-action-item"><i class="ph ph-share-fat wx-icon"></i><span class="wx-action-num">分享</span>
                 </div>
+                <div class="wx-action-item"><i class="ph ph-heart wx-icon"></i><span class="wx-action-num">10</span>
+                </div>
+                <div class="wx-action-item"><i class="ph ph-chat-centered wx-icon"></i><span
+                    class="wx-action-num">写留言</span></div>
               </div>
+            </div>
+
+            <!-- FAB for Mobile Only -->
+            <div class="mobile-fab-copy" @click="copy">
+              <i class="ph ph-copy"></i>
+              <span>复制全文</span>
             </div>
           </div>
         </div>
       </el-container>
+    </el-container>
 
-      <el-dialog title="关于 MDWX" :visible.sync="aboutDialogVisible" width="420px" center custom-class="about-dialog">
-        <div class="about-content">
-          <!-- 1. Intro -->
-          <p class="brand-intro">
-            MDWX 是一款专为微信公众号设计的排版工具。它能将 Markdown 直接转换为微信公众号排版样式，简洁美观，让写作更专注于内容本身。
-          </p>
+    <el-dialog title="关于 MDWX" :visible.sync="aboutDialogVisible" width="400px" center custom-class="about-dialog"
+      :show-close="false" :close-on-click-modal="true">
+      <div class="about-content">
+        <!-- 1. Brand Section -->
+        <div class="about-header">
+          <div class="about-logo">
+            <img src="favicon.png" alt="MDWX">
+          </div>
+          <h2 class="about-title">MDWX</h2>
+          <p class="brand-intro">让微信公众号的排版回归写作本身</p>
+        </div>
 
-          <!-- 2. Features Grid -->
-          <div class="brand-features">
-            <div class="brand-feature-item">
-              <i class="ph-bold ph-magic-wand"></i>
-              <span>完美适配微信</span>
+        <!-- 2. Features Grid (Icons) -->
+        <div class="brand-features">
+          <div class="brand-feature-item">
+            <div class="feature-icon">
+              <i class="ph ph-magic-wand"></i>
             </div>
-            <div class="brand-feature-item">
-              <i class="ph-bold ph-palette"></i>
-              <span>多款预设主题</span>
+            <span>完美适配</span>
+          </div>
+          <div class="brand-feature-item">
+            <div class="feature-icon">
+              <i class="ph ph-palette"></i>
             </div>
-            <div class="brand-feature-item">
-              <i class="ph-bold ph-code"></i>
-              <span>代码支持高亮</span>
+            <span>美学主题</span>
+          </div>
+          <div class="brand-feature-item">
+            <div class="feature-icon">
+              <i class="ph ph-code"></i>
             </div>
-            <div class="brand-feature-item">
-              <i class="ph-bold ph-link"></i>
-              <span>外链转换注脚</span>
+            <span>代码高亮</span>
+          </div>
+          <div class="brand-feature-item">
+            <div class="feature-icon">
+              <i class="ph ph-link"></i>
+            </div>
+            <span>外链转注</span>
+          </div>
+        </div>
+
+        <!-- 3. Author Card (Premium Layout) -->
+        <div class="author-card">
+          <!-- New Vertical Layout: Name -> Links -> QR -->
+          <div class="author-info">
+            <h3>Tickmao</h3>
+            <div class="author-links">
+              <a href='https://www.tickmao.com' target='_blank' class="author-link">Blog</a>
+              <span class="divider">/</span>
+              <a href='https://github.com/tickmao' target='_blank' class="author-link">Github</a>
             </div>
           </div>
-
-          <!-- 3. Author Card -->
-          <div class="author-card">
-            <div class="author-info">
-              <h3>Tickmao</h3>
-              <p>
-                专注排版美学与写作体验。<br>
-                为文字赋予最优雅的形式。
-              </p>
-              <div class="author-actions">
-                <a href='https://www.tickmao.com' target='_blank' class="author-link">
-                  Blog <i class="ph-bold ph-arrow-up-right"></i>
-                </a>
-                <a href='https://github.com/tickmao' target='_blank' class="author-link">
-                  Github <i class="ph-bold ph-arrow-up-right"></i>
-                </a>
-              </div>
-              <p class="author-copyright">2017 - 2025 ©版权所有</p>
-            </div>
-            <div class="author-qr">
-              <img src="assets/images/wechat_qrcode.jpg" alt="QR Code">
+          <div class="author-qr">
+            <div class="qr-code-wrapper">
+              <img src="assets/images/wechat_qr_new.png" alt="QR">
             </div>
           </div>
         </div>
 
-      </el-dialog>
+        <p class="about-copyright">2017 - 2025 © All Rights Reserved.</p>
+      </div>
+
+    </el-dialog>
+
+    <!-- Mobile Bottom Drawer -->
+    <transition name="fade">
+      <div class="drawer-mask" v-if="mobileMenuVisible" @click="mobileMenuVisible = false"></div>
+    </transition>
+    <transition name="slide-up">
+      <div class="mobile-drawer" v-if="mobileMenuVisible">
+        <div class="drawer-handle"></div>
+        <div class="drawer-content">
+          <!-- Reused Controls -->
+          <div class="ui-section">
+            <span class="ui-label">排版主题</span>
+            <div class="ui-grid cols-3">
+              <div class="ui-option" v-for="item in themeOption" :key="item.value"
+                :class="{active: currentTheme===item.value}" @click="currentTheme=item.value; themeChanged(item.value)">
+                {{ item.label }}
+              </div>
+            </div>
+          </div>
+          <div class="ui-section">
+            <span class="ui-label">字体选择</span>
+            <div class="ui-grid cols-2">
+              <div class="ui-option" :class="{active: currentFont === 'serif'}"
+                @click="currentFont = 'serif'; fontChanged('serif')">衬线体</div>
+              <div class="ui-option" :class="{active: currentFont === 'sans'}"
+                @click="currentFont = 'sans'; fontChanged('sans')">无衬线</div>
+            </div>
+          </div>
+          <div class="ui-section">
+            <span class="ui-label">正文字号</span>
+            <div class="ui-grid cols-5">
+              <div class="ui-option" v-for="item in sizeOption" :key="item.value"
+                :class="{active: currentSize===item.value}" @click="currentSize=item.value; sizeChanged(item.value)">
+                {{ item.value.replace('px', '') }}
+              </div>
+            </div>
+          </div>
+          <div class="ui-section">
+            <span class="ui-label">编辑器配色</span>
+            <div class="ui-grid cols-3">
+              <div class="ui-option" :class="{active: currentEditorTheme==='base16-light'}"
+                @click="currentEditorTheme='base16-light'; editorThemeChanged('base16-light')">Light</div>
+              <div class="ui-option" :class="{active: currentEditorTheme==='duotone-light'}"
+                @click="currentEditorTheme='duotone-light'; editorThemeChanged('duotone-light')">Soft</div>
+              <div class="ui-option" :class="{active: currentEditorTheme==='monokai'}"
+                @click="currentEditorTheme='monokai'; editorThemeChanged('monokai')">Dark</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+
   </div>
 
   <!-- Scripts -->
@@ -225,9 +338,9 @@
   <script src="assets/scripts/vue-eleui.js"></script>
   <script src="assets/scripts/FuriganaMD.js"></script>
 
-  <!-- CodeMirror (Baomitu) -->
-  <script src="https://lib.baomitu.com/codemirror/5.65.16/codemirror.min.js"></script>
-  <script src="https://lib.baomitu.com/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
+  <!-- CodeMirror (Local) -->
+  <script src="./assets/vendor/codemirror/codemirror.min.js"></script>
+  <script src="./assets/vendor/codemirror/mode/markdown/markdown.min.js"></script>
 
   <!-- Themes -->
   <script src="assets/scripts/themes/default.js"></script>
@@ -241,9 +354,9 @@
   <script src="assets/scripts/renderers/wx-renderer.js"></script>
   <script src="assets/scripts/editor.js"></script>
 
-  <!-- Highlight.js (Baomitu) -->
-  <link rel="stylesheet" href="https://lib.baomitu.com/highlight.js/11.7.0/styles/atom-one-dark.min.css">
-  <script src="https://lib.baomitu.com/highlight.js/11.7.0/highlight.min.js"></script>
+  <!-- Highlight.js (Local) -->
+  <link rel="stylesheet" href="./assets/vendor/highlight.js/styles/atom-one-dark.min.css">
+  <script src="./assets/vendor/highlight.js/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
 </body>
 

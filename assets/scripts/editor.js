@@ -59,7 +59,12 @@ const app = new Vue({
       },
 
       aboutDialogVisible: false, // 关于弹窗可见性
-      currentDate: '' // Current formatted date for preview
+      currentDate: '', // Current formatted date for preview
+
+      // Mobile Adaptation State
+      isMobile: false,
+      activeView: 'editor', // 'editor' | 'preview'
+      mobileMenuVisible: false // Bottom Sheet visibility
     };
   },
 
@@ -109,6 +114,8 @@ const app = new Vue({
     // 监听编辑器变化，实时刷新预览 (加入 300ms 防抖)
     // 之前是每次击键都渲染，现在改为停止输入 300ms 后再渲染，大幅降低 CPU 占用
     this.editor.on("change", debounce(function (cm, change) {
+      // SSOT Pattern: Sync data immediately
+      self.source = self.editor.getValue();
       self.refresh();
     }, 300));
 
@@ -124,17 +131,30 @@ const app = new Vue({
       method: 'get',
       url: './assets/default-content.md',
     }).then(function (resp) {
+      self.source = resp.data; // Init source
       self.editor.setValue(resp.data);
+      // refresh() will be called by 'change' event or manually
     }).catch(function (error) {
       console.error('Failed to load default content:', error);
-      self.editor.setValue('# 欢迎使用 MDWX\n\n编辑器加载失败，请检查网络连接。');
+      const errorMsg = '# 欢迎使用 MDWX\n\n编辑器加载失败，请检查网络连接。';
+      self.source = errorMsg;
+      self.editor.setValue(errorMsg);
     });
 
     // Reliable Sync Scroll (Mouseover Lock)
     // Avoids circular loops and jitter by ensuring only the hovered element drives the scroll.
     this.$nextTick(() => {
       const leftCol = document.querySelector('.editor-col');
-      const rightCol = document.querySelector('.preview-wrapper');
+
+      // Fix: Select correct preview wrapper based on visibility (Desktop vs Mobile)
+      // Since desktop-preview is always first in DOM, querySelector('.preview-wrapper') picks it even if hidden.
+      let rightCol = document.querySelector('.preview-wrapper.mobile-view .preview');
+      if (!rightCol || rightCol.offsetParent === null) {
+        rightCol = document.querySelector('.preview-wrapper.desktop-preview .preview');
+      }
+
+      // Fallback if neither standard class works (robustness)
+      if (!rightCol) rightCol = document.querySelector('.preview-wrapper');
 
       let activeSide = null; // 'left' or 'right'
 
@@ -187,13 +207,23 @@ const app = new Vue({
         this.title = 'MDWX，我也可以优雅的写作'; // Default fallback
       }
 
-      let output = marked(source, { renderer: this.wxRenderer.getRenderer() });
+      try {
+        let output = marked(source, { renderer: this.wxRenderer.getRenderer() });
 
-      // 如果存在外部链接引用，追加注脚部分
-      if (this.wxRenderer.hasFootnotes()) {
-        output += this.wxRenderer.buildFootnotes();
+        // 如果存在外部链接引用，追加注脚部分
+        if (this.wxRenderer.hasFootnotes()) {
+          output += this.wxRenderer.buildFootnotes();
+        }
+        return output;
+      } catch (e) {
+        console.error('Rendering Error:', e);
+        return `<div style="color:red; padding:20px;">
+          <h3>渲染错误</h3>
+          <p>很抱歉，渲染文档时发生错误。</p>
+          <pre>${e.message}</pre>
+          <pre>${e.stack}</pre>
+        </div>`;
       }
-      return output;
     },
 
     /**
@@ -243,7 +273,9 @@ const app = new Vue({
      * 刷新预览区域
      */
     refresh: function () {
-      this.output = this.renderWeChat(this.editor.getValue());
+      // Logic: Use SSOT 'source' if available, fallback to editor.getValue() if source is empty (init edge case)
+      const content = this.source || (this.editor ? this.editor.getValue() : '');
+      this.output = this.renderWeChat(content);
     },
 
     /**
@@ -251,32 +283,32 @@ const app = new Vue({
      * 将渲染区的内容复制到剪贴板，带有样式
      */
     copy: function () {
-      const clipboardDiv = document.getElementById('output');
-      clipboardDiv.focus();
+      let clipboardDiv = document.getElementById('output-mobile');
+      if (!clipboardDiv || clipboardDiv.offsetParent === null) {
+        clipboardDiv = document.getElementById('output-desktop');
+      }
 
+      if (!clipboardDiv) {
+        this.$message({ message: '无法获取内容', type: 'warning' });
+        return;
+      }
+
+      clipboardDiv.focus();
       window.getSelection().removeAllRanges();
-      const range = document.createRange();
+      let range = document.createRange();
       range.setStartBefore(clipboardDiv.firstChild);
       range.setEndAfter(clipboardDiv.lastChild);
       window.getSelection().addRange(range);
 
       try {
         if (document.execCommand('copy')) {
-          this.$message({
-            message: '已复制',
-            type: 'success',
-            center: true,
-            offset: 80,
-            customClass: 'minimal-message',
-            duration: 1500
-          });
+          this.$message({ message: '已复制到剪贴板', type: 'success', customClass: 'about-dialog' });
+        } else {
+          this.$message({ message: '复制失败，请手动复制', type: 'warning' });
         }
-      } catch (e) {
-        this.$message({
-          message: '❌ 复制失败，请手动全选复制。',
-          type: 'warning',
-          duration: 3000
-        });
+      } catch (err) {
+        console.error(err);
+        this.$message({ message: '复制失败，请手动复制', type: 'warning' });
       }
       window.getSelection().removeAllRanges();
     },
@@ -326,11 +358,6 @@ const app = new Vue({
       this.showRightArrow = remaining > tolerance;
     },
 
-    /**
-     * 横向滚动容器
-     * @param {Event} event - 点击事件
-     * @param {Number} offset - 滚动距离
-     */
     scrollContainer: function (event, offset) {
       // Find wrapper then find the group inside it
       const wrapper = event.target.closest('.scroll-wrapper');
@@ -340,6 +367,45 @@ const app = new Vue({
           group.scrollBy({ left: offset, behavior: 'smooth' });
           // Note: The 'scroll' event listener on the group will trigger checkScroll
         }
+      }
+    },
+
+    /**
+     * Mobile Logic
+     */
+    checkMobile: function () {
+      this.isMobile = window.innerWidth <= 768;
+      // Reset menu if switching to desktop
+      if (!this.isMobile) {
+        this.mobileMenuVisible = false;
+        this.activeView = 'editor'; // Default reset
+      }
+    }
+  },
+
+  created: function () {
+    // Initial check
+    this.checkMobile();
+    window.addEventListener('resize', () => {
+      this.checkMobile();
+    });
+  },
+
+  watch: {
+    // Fix: CodeMirror display bug when switching from hidden to visible
+    activeView: function (newVal) {
+      if (newVal === 'editor' && this.editor) {
+        this.$nextTick(() => {
+          this.editor.refresh();
+        });
+      } else if (newVal === 'preview') {
+        // Critical Fix: Flux State immediately before render (SSOT)
+        // Ensures that even if debounce hasn't fired, we capture the latest edits.
+        if (this.editor) {
+          this.source = this.editor.getValue();
+        }
+        // Force re-render when switching to preview to prevent blank screen
+        this.refresh();
       }
     }
   }
