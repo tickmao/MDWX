@@ -20,12 +20,11 @@ const app = new Vue({
       currentEditorTheme: 'base16-light', // 当前编辑器主题
       editor: null, // CodeMirror 编辑器实例
 
-      // 内置字体选项 (按衬线和无衬线分类)
-      // 内置字体选项 (按衬线和无衬线分类)
-      builtinFonts: [
-        { label: '衬线体 (Serif)', value: "'PT Serif', 'Songti SC', 'Source Han Serif CN', 'Noto Serif SC', 'SimSun', serif" },
-        { label: '无衬线体 (Sans-serif)', value: "'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif" }
-      ],
+      // 字体栈定义 (Centralized Font Stacks)
+      fontStacks: {
+        'serif': "'PT Serif', 'Songti SC', 'STSong', 'Huawen Songti', 'Source Han Serif CN', 'Noto Serif SC', 'SimSun', serif",
+        'sans': "'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif"
+      },
       currentFont: 'serif',
 
       // 字体大小选项 (User Customized)
@@ -122,7 +121,7 @@ const app = new Vue({
     // 初始化微信渲染器
     this.wxRenderer = new WxRenderer({
       theme: this.styleThemes.tickmao,
-      fonts: this.currentFont,
+      fonts: this.fontStacks[this.currentFont],
       size: this.currentSize
     });
 
@@ -237,13 +236,8 @@ const app = new Vue({
      * 字体切换处理
      */
     fontChanged: function (fontKey) {
-      const fontMap = {
-        'serif': "'PT Serif', 'Songti SC', 'Source Han Serif CN', 'Noto Serif SC', 'SimSun', serif",
-        'sans': "'Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif"
-      };
-      const fontStack = fontMap[fontKey] || fontKey;
       this.wxRenderer.setOptions({
-        fonts: fontStack
+        fonts: this.fontStacks[fontKey]
       });
       this.refresh();
     },
